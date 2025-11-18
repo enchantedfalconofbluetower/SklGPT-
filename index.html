@@ -4,34 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SklGPT Model Selector</title>
-    <!-- Favicon link updated to the raw GitHub URL -->
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/enchantedfalconofbluetower/SklGPT-/main/Untitled_design-removebg-preview.png">
-    <!-- Load Tailwind CSS -->
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/enchantedfalconofbluetower/sklGPT-mobile/main/Untitled_design-removebg-preview.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Custom styles to ensure full screen and no scrollbars */
         html, body {
             height: 100%;
             margin: 0;
             padding: 0;
-            overflow: hidden; 
             font-family: 'Inter', sans-serif;
+            background-color: #1f2937;
         }
-
-        /* Set iframe to fill its parent container */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 140px 1fr; /* Slightly wider sidebar for bigger buttons */
+            height: 100vh;
+            overflow: hidden;
+        }
         .full-screen-iframe {
             width: 100%;
             height: 100%;
-            border: none; 
+            border: none;
+            background-color: transparent;
         }
-
-        /* Ensure smooth transitions on button state changes */
+        /* Completely black sidebar */
+        .sidebar-black {
+            background-color: #000000 !important;
+        }
+        /* Rainbow gradient buttons */
         .btn-model {
-            transition: all 0.2s ease-in-out;
+            background: linear-gradient(90deg,
+                #ef4444, #f97316, #facc15, #22c55e, #0ea5e9, #6366f1, #a855f7
+            );
+            color: white;
+            border: none;
+            transition: all 0.3s ease-in-out;
+            transform: scale(1);
+            height: 48px; /* Fixed identical height */
+            font-weight: 600;
+        }
+        .btn-model.active {
+            filter: brightness(1.3);
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
+            transform: scale(1.05);
+        }
+        .btn-model:not(.active):hover {
+            filter: brightness(1.15);
+            transform: scale(1.02);
         }
     </style>
     <script>
-        // Define the chatbot models and their corresponding URLs
         const models = {
             "SklGPT 1-o": "https://cdn.botpress.cloud/webchat/v3.3/shareable.html?configUrl=https://files.bpcontent.cloud/2025/11/05/07/20251105075827-MH91154I.json",
             "SklGPT 2-o": "https://cdn.botpress.cloud/webchat/v3.3/shareable.html?configUrl=https://files.bpcontent.cloud/2025/11/05/07/20251105075827-MH91154I.json",
@@ -40,111 +61,56 @@
             "SklGPT 3-o Flash": "https://share.chatling.ai/s/fGy8pH3sa6U8EXu",
             "SklGPT 3-o Ultra": "https://cdn.botpress.cloud/webchat/v3.3/shareable.html?configUrl=https://files.bpcontent.cloud/2025/11/15/07/20251115071707-4HTGA5AI.json"
         };
-
-        // The key for the default model
         const defaultModelKey = "SklGPT 3-o Ultra";
-        
-        // Function to update the iframe source and button styles
         function loadModel(modelName, url) {
             const iframe = document.getElementById('chatbot-iframe');
             const buttons = document.querySelectorAll('.btn-model');
-            
-            if (iframe) {
-                iframe.src = url;
-            }
-
-            // Update active state for buttons
+            if (iframe) iframe.src = url;
             buttons.forEach(button => {
-                button.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg');
-                button.classList.add('hover:bg-gray-700', 'text-gray-300');
+                button.classList.remove('active');
                 if (button.dataset.model === modelName) {
-                    button.classList.add('bg-indigo-600', 'text-white', 'shadow-lg');
-                    button.classList.remove('hover:bg-gray-700', 'text-gray-300');
+                    button.classList.add('active');
                 }
             });
-
-            // Optional: Update document title for context
             document.title = `${modelName} | SklGPT Selector`;
         }
-
-        // Initialize the app when the DOM is fully loaded
         document.addEventListener('DOMContentLoaded', () => {
             const sidebar = document.getElementById('sidebar-menu');
-            const iframe = document.getElementById('chatbot-iframe');
-
-            // Set initial state for iframe source
-            if (iframe) {
-                iframe.src = models[defaultModelKey];
-            }
-
-            // Create and append buttons to the sidebar
             Object.keys(models).forEach(modelName => {
                 const url = models[modelName];
                 const button = document.createElement('button');
-                
-                // Base Tailwind classes for buttons
-                button.className = 'btn-model w-full py-2 px-4 rounded-xl text-sm font-medium transition duration-150 ease-in-out text-left';
+                button.className = 'btn-model w-full rounded-xl text-white text-left px-4 flex items-center';
                 button.textContent = modelName;
                 button.dataset.model = modelName;
-                
-                // Initial styling: Active button for default, others normal
-                if (modelName === defaultModelKey) {
-                    button.classList.add('bg-indigo-600', 'text-white', 'shadow-lg');
-                } else {
-                    button.classList.add('bg-gray-800', 'text-gray-300', 'hover:bg-gray-700');
-                }
-
-                // Add click handler
                 button.addEventListener('click', () => loadModel(modelName, url));
                 sidebar.appendChild(button);
             });
-            
-            // Set initial button active state after creation
             loadModel(defaultModelKey, models[defaultModelKey]);
         });
     </script>
 </head>
-<body class="bg-gray-50 antialiased">
-
-    <!-- Main Container: Full viewport height and horizontal flex layout -->
-    <div class="h-screen flex flex-row">
-        
-        <!-- Left Sidebar Panel -->
-        <aside class="w-64 flex-shrink-0 bg-gray-900 shadow-2xl p-4 flex flex-col space-y-4">
-            <!-- App Header/Title -->
-            <div class="p-2 mb-4 text-center">
-                <h1 class="text-3xl font-extrabold text-white tracking-tight">SklGPT</h1>
-                <p class="text-xs text-indigo-400 mt-1">Model Selector</p>
+<body class="antialiased">
+    <div class="grid-container">
+        <!-- Left Sidebar - Completely Black -->
+        <aside class="sidebar-black p-4 flex flex-col">
+            <!-- Logo/Title -->
+            <div class="mb-8 text-center">
+                <h1 class="text-2xl font-extrabold text-white tracking-tight">SklGPT</h1>
+                <p class="text-xs text-gray-400 mt-1">Model Selector</p>
             </div>
-            
-            <!-- Dynamic Button Container -->
-            <nav id="sidebar-menu" class="flex flex-col space-y-2 overflow-y-auto">
-                <!-- Buttons will be injected here by JavaScript -->
+            <!-- Model Buttons -->
+            <nav id="sidebar-menu" class="flex flex-col space-y-3 flex-1 overflow-y-auto">
+                <!-- Buttons injected by JS -->
             </nav>
-
-            <!-- Footer Placeholder (Optional) -->
-            <div class="mt-auto p-2 border-t border-gray-700 text-center">
-                <p class="text-xs text-gray-500">© School Ke Log</p>
+            <!-- Footer -->
+            <div class="mt-auto pt-4 border-t border-gray-800 text-center">
+                <p class="text-xs text-white">© School Ke Log</p>
             </div>
         </aside>
-
-        <!-- Right Content Area (Main Iframe) -->
-        <main class="flex-1 min-w-0 bg-white">
-            <iframe 
-                id="chatbot-iframe"
-                class="full-screen-iframe"
-                src=""
-                title="SklGPT Chatbot Embed"
-                allowfullscreen>
-            </iframe>
+        <!-- Main Chat Area -->
+        <main class="overflow-hidden">
+            <iframe id="chatbot-iframe" class="full-screen-iframe" src="" title="SklGPT Chatbot Embed" allowfullscreen></iframe>
         </main>
-
     </div>
-
 </body>
 </html>
-
-
-
-
-
